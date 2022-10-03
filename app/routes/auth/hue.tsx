@@ -1,5 +1,5 @@
-import type { LoaderFunction } from '@remix-run/node'
-import { redirect } from '@remix-run/node'
+import type { LoaderFunction } from '@remix-run/cloudflare'
+import { redirect } from '@remix-run/cloudflare'
 import { userHueCode } from '~/cookies'
 
 export const loader: LoaderFunction = async ({ request }) => {
