@@ -1,0 +1,5 @@
+name = "site-example"
+
+workers_dev = true
+compatibility_date = "2022-05-05"
+compatibility_flags = ["streams_enable_constructors"]

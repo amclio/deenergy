@@ -2,7 +2,7 @@
 
 import { useInterval } from 'react-use'
 import { useEffect } from 'react'
-import ky from 'ky'
+import ky from 'ky-universal'
 import {
   useHueAccessToken,
   useHueRefreshToken,

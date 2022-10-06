@@ -1,7 +1,7 @@
-import type { Options } from 'ky'
-import ky from 'ky'
-import { fetch } from '@remix-run/node'
+import ky from 'ky-universal'
+import {} from '@remix-run/cloudflare'
 
-export const client = ky.create({ fetch: fetch as Options['fetch'] })
+export const client = ky.create({ fetch })
+// export const client = ky.create({})
 
 export const hueClient = client.extend({ prefixUrl: 'https://api.meethue.com' })

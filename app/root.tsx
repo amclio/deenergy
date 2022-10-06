@@ -1,5 +1,5 @@
-import type { MetaFunction } from '@remix-run/node'
-import { json } from '@remix-run/node'
+import type { MetaFunction, LoaderFunction } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
 import {
   Links,
   LiveReload,
@@ -20,10 +20,10 @@ declare global {
   }
 }
 
-export async function loader() {
+export const loader: LoaderFunction = ({ context }) => {
   return json({
     ENV: {
-      HUE_CLIENT_ID: process.env.HUE_CLIENT_ID,
+      HUE_CLIENT_ID: context.HUE_CLIENT_ID,
     },
   })
 }

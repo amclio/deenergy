@@ -2,23 +2,24 @@ import type { ChangeEvent } from 'react'
 import { styled } from '~/libs/stitches'
 import { client } from '~/libs/ky'
 
-import type { LoaderFunction } from '@remix-run/node'
+import type { LoaderFunction } from '@remix-run/cloudflare'
 import { userHueCode } from '~/cookies'
 import { useLoaderData } from '@remix-run/react'
 import type { HueTokenResponse } from '~/interfaces/hue'
 import { useRefreshHueToken } from '~/hooks/hue'
 import { useHueAccessToken, useHueRefreshToken } from '~/stores/hue'
 import { useEffect, useState } from 'react'
-import ky from 'ky'
+import ky from 'ky-universal'
 
 interface LoaderData {
   hueCode: string
   hueAccessToken: string
   hueRefreshToken: HueTokenResponse['refresh_token']
   hueAccessTokenExpiresIn: HueTokenResponse['expires_in']
+  hueClientID: string
 }
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader: LoaderFunction = async ({ request, context }) => {
   const cookieHeader = request.headers.get('Cookie')
   const cookie = (await userHueCode.parse(cookieHeader)) || {}
 
@@ -34,8 +35,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 
     auths.set('grant_type', 'authorization_code')
     auths.set('code', hueCode)
-    auths.set('client_id', process.env.HUE_CLIENT_ID || '')
-    auths.set('client_secret', process.env.HUE_CLIENT_SECRET || '')
+    auths.set('client_id', (context.HUE_CLIENT_ID as string) || '')
+    auths.set('client_secret', (context.HUE_CLIENT_SECRET as string) || '')
 
     const res = await client.post('https://api.meethue.com/v2/oauth2/token', {
       body: auths,
@@ -54,6 +55,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     hueAccessToken,
     hueRefreshToken,
     hueAccessTokenExpiresIn,
+    hueClientID: context.HUE_CLIENT_ID as string,
   }
   const body = JSON.stringify(bodyObject)
 
@@ -66,12 +68,10 @@ export const loader: LoaderFunction = async ({ request }) => {
 }
 
 export default function Index() {
-  const { hueCode, hueRefreshToken, hueAccessToken } =
+  const { hueCode, hueRefreshToken, hueAccessToken, hueClientID } =
     useLoaderData<LoaderData>()
   const HUE_CLIENT_ID =
-    typeof window !== 'undefined'
-      ? window.ENV.HUE_CLIENT_ID
-      : process.env.HUE_CLIENT_ID
+    typeof window !== 'undefined' ? window.ENV.HUE_CLIENT_ID : hueClientID
 
   const [refreshToken, setRefreshToken] = useHueRefreshToken()
   const [accessToken, setAccessToken] = useHueAccessToken()
