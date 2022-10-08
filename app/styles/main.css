@@ -1,0 +1,345 @@
+@font-face {
+  font-family: 'SUIT';
+  font-weight: 400;
+  src: url('/assets/fonts/suit/SUIT-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'SUIT';
+  font-weight: 500;
+  src: url('/assets/fonts/suit/SUIT-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'SUIT';
+  font-weight: 600;
+  src: url('/assets/fonts/suit/SUIT-SemiBold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'SUIT';
+  font-weight: 700;
+  src: url('/assets/fonts/suit/SUIT-Bold.woff2') format('woff2');
+}
+
+:root {
+  /* Shadows from open props */
+  --shadow-color: 220 3% 15%;
+  --shadow-strength: 1%;
+  --shadow-1: 0 1px 2px -1px hsl(var(--shadow-color) /
+        calc(var(--shadow-strength) + 9%));
+  --shadow-2: 0 3px 5px -2px hsl(var(--shadow-color) /
+          calc(var(--shadow-strength) + 3%)),
+    0 7px 14px -5px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 5%));
+  --shadow-3: 0 -1px 3px 0 hsl(var(--shadow-color) /
+          calc(var(--shadow-strength) + 2%)),
+    0 1px 2px -5px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 2%)),
+    0 2px 5px -5px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 4%)),
+    0 4px 12px -5px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 5%)),
+    0 12px 15px -5px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 7%));
+  --shadow-4: 0 -2px 5px 0 hsl(var(--shadow-color) /
+          calc(var(--shadow-strength) + 2%)),
+    0 1px 1px -2px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 3%)),
+    0 2px 2px -2px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 3%)),
+    0 5px 5px -2px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 4%)),
+    0 9px 9px -2px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 5%)),
+    0 16px 16px -2px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 6%));
+  --shadow-5: 0 -1px 2px 0 hsl(var(--shadow-color) /
+          calc(var(--shadow-strength) + 2%)),
+    0 2px 1px -2px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 3%)),
+    0 5px 5px -2px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 3%)),
+    0 10px 10px -2px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 4%)),
+    0 20px 20px -2px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 5%)),
+    0 40px 40px -2px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 7%));
+  --shadow-6: 0 -1px 2px 0 hsl(var(--shadow-color) /
+          calc(var(--shadow-strength) + 2%)),
+    0 3px 2px -2px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 3%)),
+    0 7px 5px -2px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 3%)),
+    0 12px 10px -2px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 4%)),
+    0 22px 18px -2px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 5%)),
+    0 41px 33px -2px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 6%)),
+    0 100px 80px -2px hsl(var(--shadow-color) /
+          calc(var(--shadow-strength) + 7%));
+  --inner-shadow-0: inset 0 0 0 1px
+    hsl(var(--shadow-color) / calc(var(--shadow-strength) + 9%));
+  --inner-shadow-1: inset 0 1px 2px 0
+    hsl(var(--shadow-color) / calc(var(--shadow-strength) + 9%));
+  --inner-shadow-2: inset 0 1px 4px 0
+    hsl(var(--shadow-color) / calc(var(--shadow-strength) + 9%));
+  --inner-shadow-3: inset 0 2px 8px 0
+    hsl(var(--shadow-color) / calc(var(--shadow-strength) + 9%));
+  --inner-shadow-4: inset 0 2px 14px 0
+    hsl(var(--shadow-color) / calc(var(--shadow-strength) + 9%));
+}
+
+.highlight {
+  position: relative;
+}
+
+.highlight::before {
+  /* Highlight color */
+  background-color: rgba(92, 124, 250, 0.4);
+
+  content: '';
+  position: absolute;
+  width: calc(100% + 4px);
+  height: 40%;
+  left: -2px;
+  bottom: 0;
+  z-index: -1;
+  transform: rotate(-1deg);
+}
+
+body {
+  background-color: #fcfcfc;
+}
+
+body {
+  font-family: SUIT, sans-serif;
+  color: #212529;
+  word-break: keep-all;
+}
+
+body > .content {
+  margin-top: 120px;
+}
+
+a {
+  color: #000000;
+  text-decoration: none;
+}
+
+section {
+  padding: 0 1em;
+  margin: 4em 0;
+}
+
+section > .header {
+  margin-bottom: 2em;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+header {
+  display: flex;
+  user-select: none;
+  padding: 0 1em;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  background-color: rgba(255, 255, 255, 0.4);
+  z-index: 10;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #f1f3f5;
+}
+
+header .backdrop {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 60px;
+}
+
+header .container {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+header .container .title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+header .container .sub {
+  font-size: 0.9rem;
+  color: #868e96;
+}
+
+section.reserved {
+  text-align: center;
+  margin-top: 9em;
+  margin-bottom: 8em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+section.reserved .section {
+  margin-bottom: 8px;
+}
+section.reserved .section .current {
+  font-size: 0.9rem;
+  color: #868e96;
+  margin-bottom: 2px;
+}
+section.reserved .energy .number {
+  font-size: 2rem;
+  font-weight: bold;
+}
+section.reserved .energy .wh {
+  margin-left: 2px;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+section.reserved .check {
+  margin: 2em 0;
+}
+section.reserved .check .lable {
+  padding: 6px 12px;
+  border-radius: 8px;
+  display: inline;
+  color: #3b5bdb;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background-color: #dbe4ff;
+}
+section.reserved .check .container {
+  margin: 0.6em 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+section.reserved .check .container .circle {
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  background-color: #5c7cfa;
+}
+section.reserved .check .container .circle svg {
+  width: 1em;
+  height: 1em;
+  margin-top: 2px;
+  margin-left: 2px;
+  display: inline-block;
+}
+
+section.graph {
+  margin-bottom: 0;
+}
+
+section.compare {
+  margin-top: 2em;
+}
+section.compare .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 1em 1em;
+  font-size: 1rem;
+}
+section.compare .container .header {
+  color: #495057;
+}
+section.compare .container .value .number {
+  font-weight: bold;
+  font-size: 1.4rem;
+}
+section.compare .container .value .wh {
+  color: #868e96;
+  font-weight: 600;
+}
+
+section.devices .container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 1.4em 1em;
+}
+
+section.devices .card {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  padding: 1.5em 1.2em;
+  border-radius: 18px;
+  aspect-ratio: 1.4;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-1);
+
+  transition: background-color 0.2s, border 0.2s;
+}
+section.devices .card.active {
+  background-color: #edf2ff;
+  border: 1px solid #91a7ff;
+}
+
+section.devices .card .name {
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-bottom: 6px;
+}
+section.devices .card .status {
+  color: #868e96;
+  font-size: 0.8rem;
+}
+section.devices .card .icon {
+  position: absolute;
+  right: -4px;
+  bottom: -12px;
+  width: 50%;
+}
+
+section.devices .card .icon img {
+  width: 100%;
+}
+
+section.more {
+  margin: 8em 0;
+}
+
+section.more .container {
+  min-height: 200px;
+  margin: 0 1em;
+}
+section.more .container .box {
+  color: #f8f9fa;
+  padding: 2.4em 1.8em;
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  background-color: #212529;
+  box-shadow: 0px 0px 80px 2px #495057;
+}
+
+section.more .container .box .sub {
+  color: #adb5bd;
+}
+
+section.more .container .box .title {
+  font-size: 1.8rem;
+  margin: 0.6em 0;
+  font-weight: bold;
+  line-height: 140%;
+}
+section.more .container .box .button-box {
+  margin-top: 3.5em;
+}
+section.more .container .box .button-box a.button {
+  background-color: #f8f9fa;
+  margin: 4em 0;
+  padding: 0.5em 1.2em;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: background-color 0.1s;
+}
+section.more .container .box .button-box a.button:hover {
+  background-color: #e9ecef;
+}
+
+footer .container {
+  color: #868e96;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 3em 0;
+  padding: 0 3em;
+  gap: 10px;
+}
+
+footer .container .github a {
+  color: #868e96;
+  border-bottom: 1px dashed #000;
+}
