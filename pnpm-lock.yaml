@@ -25,7 +25,6 @@ specifiers:
   recoil: ^0.7.5
   recoil-persist: ^4.2.0
   typescript: ^4.7.4
-  web-streams-polyfill: ^3.2.1
   wrangler: ^2.0.27
 
 dependencies:
@@ -37,14 +36,13 @@ dependencies:
   chart.js: 3.9.1
   cross-env: 7.0.3
   ky: 0.31.1
-  ky-universal: 0.10.1_banenvuwkqogi4si7csssu2xxm
+  ky-universal: 0.10.1_ky@0.31.1
   modern-normalize: 1.1.0
   react: 17.0.2
   react-dom: 17.0.2_react@17.0.2
   react-use: 17.4.0_sfoxds7t5ydpegc3knd667wn6m
   recoil: 0.7.5_sfoxds7t5ydpegc3knd667wn6m
   recoil-persist: 4.2.0_recoil@0.7.5
-  web-streams-polyfill: 3.2.1
 
 devDependencies:
   '@cloudflare/workers-types': 3.16.0
@@ -5204,7 +5202,7 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /ky-universal/0.10.1_banenvuwkqogi4si7csssu2xxm:
+  /ky-universal/0.10.1_ky@0.31.1:
     resolution: {integrity: sha512-r8909k+ELKZAxhVA5c440x22hqw5XcMRwLRbgpPQk4JHy3/ddJnvzcnSo5Ww3HdKdNeS3Y8dBgcIYyVahMa46g==}
     engines: {node: '>=14'}
     peerDependencies:
@@ -5217,7 +5215,6 @@ packages:
       abort-controller: 3.0.0
       ky: 0.31.1
       node-fetch: 3.2.10
-      web-streams-polyfill: 3.2.1
     dev: false
 
   /ky/0.31.1:
