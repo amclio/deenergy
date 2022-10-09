@@ -2,24 +2,28 @@
   font-family: 'SUIT';
   font-weight: 400;
   src: url('/assets/fonts/suit/SUIT-Regular.woff2') format('woff2');
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'SUIT';
   font-weight: 500;
   src: url('/assets/fonts/suit/SUIT-Medium.woff2') format('woff2');
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'SUIT';
   font-weight: 600;
   src: url('/assets/fonts/suit/SUIT-SemiBold.woff2') format('woff2');
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'SUIT';
   font-weight: 700;
   src: url('/assets/fonts/suit/SUIT-Bold.woff2') format('woff2');
+  font-display: swap;
 }
 
 :root {
@@ -250,22 +254,47 @@ section.devices .container {
 }
 
 section.devices .card {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   background-color: #f8f9fa;
   border: 1px solid #dee2e6;
-  padding: 1.5em 1.2em;
+  padding: 1.2em 1em;
   border-radius: 18px;
   aspect-ratio: 1.4;
   position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-1);
+  box-shadow: var(--shadow-2);
+  cursor: pointer;
 
-  transition: background-color 0.2s, border 0.2s;
+  transition: background-color 0.1s, border 0.1s;
 }
+section.devices .card:active {
+  animation: press 0.1s;
+}
+
+@keyframes press {
+  0% {
+    transform: scale(100%) translateY(0);
+  }
+  25% {
+    transform: scale(98%) translateY(4px);
+  }
+  100% {
+    transform: scale(100%) translateY(0);
+  }
+}
+
 section.devices .card.active {
+  color: #228be6;
   background-color: #edf2ff;
   border: 1px solid #91a7ff;
 }
 
+section.devices .card:not(.active) .name {
+  color: #868e96;
+}
 section.devices .card .name {
   font-weight: bold;
   font-size: 1.2rem;
@@ -284,6 +313,20 @@ section.devices .card .icon {
 
 section.devices .card .icon img {
   width: 100%;
+}
+section.devices .card:not(.active) .icon img {
+  filter: grayscale(80%);
+}
+
+section.devices .card:not(.active) .spending {
+  color: #868e96;
+}
+
+section.devices .card .spending .number {
+  font-weight: 600;
+}
+section.devices .card .spending .wh {
+  font-size: 0.7rem;
 }
 
 section.more {

@@ -1,4 +1,8 @@
-import type { MetaFunction, LoaderFunction } from '@remix-run/cloudflare'
+import type {
+  MetaFunction,
+  LoaderFunction,
+  LinksFunction,
+} from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import {
   Links,
@@ -13,6 +17,8 @@ import { getCssText } from '~/libs/stitches'
 import { RecoilRoot } from 'recoil'
 
 import normalize from 'modern-normalize/modern-normalize.css'
+import { useSsrComplectedState } from './stores/prevent-ssr'
+import { useEffect } from 'react'
 
 declare global {
   interface Window {
@@ -34,8 +40,46 @@ export const meta: MetaFunction = () => ({
   viewport: 'width=device-width,initial-scale=1',
 })
 
-export function links() {
-  return [{ rel: 'stylesheet', href: normalize }]
+export const links: LinksFunction = () => {
+  return [
+    { rel: 'stylesheet', href: normalize },
+    {
+      rel: 'preload',
+      href: `/assets/fonts/suit/SUIT-Regular.woff2`,
+      as: 'font',
+      type: 'font/woff2',
+      crossOrigin: 'anonymous',
+    },
+    {
+      rel: 'preload',
+      href: `/assets/fonts/suit/SUIT-Medium.woff2`,
+      as: 'font',
+      type: 'font/woff2',
+      crossOrigin: 'anonymous',
+    },
+    {
+      rel: 'preload',
+      href: `/assets/fonts/suit/SUIT-SemiBold.woff2`,
+      as: 'font',
+      type: 'font/woff2',
+      crossOrigin: 'anonymous',
+    },
+    {
+      rel: 'preload',
+      href: `/assets/fonts/suit/SUIT-Bold.woff2`,
+      as: 'font',
+      type: 'font/woff2',
+      crossOrigin: 'anonymous',
+    },
+  ]
+}
+
+function PreventSsr() {
+  // Ref: https://stackoverflow.com/questions/68110629/nextjs-react-recoil-persist-values-in-local-storage-initial-page-load-in-wrong/70459889#70459889
+  const setSsrCompleted = useSsrComplectedState()
+  useEffect(setSsrCompleted, [setSsrCompleted])
+
+  return null
 }
 
 export default function App() {
@@ -63,6 +107,7 @@ export default function App() {
           />
           <Scripts />
           <LiveReload />
+          <PreventSsr />
         </RecoilRoot>
       </body>
     </html>

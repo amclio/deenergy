@@ -1,7 +1,12 @@
 import Chart from 'chart.js/auto'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-import styles from '~/styles/main.css'
+import styles from '~/styles/processed/main.css'
+
+import type { CardProps } from '~/components/main/card'
+import { Card as CardContainer } from '~/components/main/card'
+import { devicesStateFamily, entireUsageState } from '~/stores/devices'
+import { useRecoilState } from 'recoil'
 
 export function links() {
   return [{ rel: 'stylesheet', href: styles }]
@@ -58,6 +63,80 @@ function Graph() {
   return <canvas id="LineG" ref={ref} style={{ width: '100%' }}></canvas>
 }
 
+const Devices: {
+  id: number
+  name: string
+  spending: number
+  imageSrc: string
+}[] = [
+  {
+    id: 0,
+    name: '전구',
+    spending: 150,
+    imageSrc: './assets/images/lamp.png',
+  },
+  {
+    id: 1,
+    name: 'TV',
+    spending: 300,
+    imageSrc: './assets/images/tv.png',
+  },
+  {
+    id: 2,
+    name: '에어컨',
+    spending: 1500,
+    imageSrc: './assets/images/air-conditioner.png',
+  },
+  {
+    id: 3,
+    name: '선풍기',
+    spending: 50,
+    imageSrc: './assets/images/fan.png',
+  },
+  {
+    id: 4,
+    name: '충전기',
+    spending: 15,
+    imageSrc: './assets/images/charger.png',
+  },
+]
+
+function Card({ cardId, ...props }: { cardId: number } & CardProps) {
+  const [cardState, setCardState] = useRecoilState(devicesStateFamily(cardId))
+
+  const [entireUsage, setEntireUsage] = useRecoilState(entireUsageState)
+  const [isLoaded, setLoaded] = useState(false)
+  console.log('~ entireUsage', entireUsage)
+
+  const handleClick = () => {
+    setEntireUsage((curr) =>
+      !cardState.status ? curr + props.spending : curr - props.spending
+    )
+    setCardState((state) => ({ ...state, status: !state.status }))
+  }
+
+  useEffect(() => {
+    setCardState((status) => ({ ...status, spending: props.spending }))
+  }, [props.spending, setCardState])
+
+  useEffect(() => {
+    if (props.spending && cardState.status !== null && !isLoaded) {
+      setEntireUsage((curr) =>
+        cardState.status ? curr + props.spending : curr
+      )
+      setLoaded(true)
+    }
+  }, [cardState.status, isLoaded, props.spending, setEntireUsage])
+
+  return (
+    <CardContainer
+      isActive={cardState.status || false}
+      onClick={handleClick}
+      {...props}
+    />
+  )
+}
+
 export default function Index() {
   return (
     <>
@@ -105,48 +184,9 @@ export default function Index() {
         <section className="devices">
           <div className="header">기기</div>
           <div className="container">
-            <div className="card active">
-              <div className="name">전등</div>
-              <div className="status">켜짐</div>
-
-              <div className="icon">
-                <img src="./assets/images/lamp.png" alt="Lamp" />
-              </div>
-            </div>
-            <div className="card">
-              <div className="name">TV</div>
-              <div className="status">꺼짐</div>
-              <div className="icon">
-                <img src="./assets/images/tv.png" alt="Television" />
-              </div>
-            </div>
-            <div className="card">
-              <div className="name">에어컨</div>
-              <div className="status">꺼짐</div>
-
-              <div className="icon">
-                <img
-                  src="./assets/images/air-conditioner.png"
-                  alt="Air conditioner"
-                />
-              </div>
-            </div>
-            <div className="card">
-              <div className="name">선풍기</div>
-              <div className="status">꺼짐</div>
-
-              <div className="icon">
-                <img src="./assets/images/fan.png" alt="Electric fan" />
-              </div>
-            </div>
-            <div className="card">
-              <div className="name">충전기</div>
-              <div className="status">꺼짐</div>
-
-              <div className="icon">
-                <img src="./assets/images/charger.png" alt="Charger" />
-              </div>
-            </div>
+            {Devices.map(({ id, ...metas }) => (
+              <Card key={id} cardId={id} {...metas} />
+            ))}
           </div>
         </section>
         <section className="more">
