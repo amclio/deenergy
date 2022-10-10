@@ -11,6 +11,7 @@ const LabelContainer = styled('div', {
   display: 'inline',
   fontSize: '0.8rem',
   fontWeight: 600,
+  height: 'fit-content',
 
   variants: {
     state: {

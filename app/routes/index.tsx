@@ -204,7 +204,11 @@ export default function Index() {
           </div>
         </section>
         <section className="devices">
-          <div className="header">기기</div>
+          <div className="header-container">
+            <div className="header">기기</div>
+            <StatusLabel state={currentState || 'good'} />
+          </div>
+
           <div className="container">
             {devices.map(({ id, ...metas }) => (
               <Card key={id} cardId={id} {...metas} />

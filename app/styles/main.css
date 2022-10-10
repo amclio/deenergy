@@ -94,10 +94,10 @@
   transform: rotate(-1deg);
 }
 
-.highlight.Warning::before {
+.highlight.warning::before {
   background-color: rgba(240, 140, 0, 0.4);
 }
-.highlight.Danger::before {
+.highlight.danger::before {
   background-color: rgba(224, 49, 49, 0.4);
 }
 
@@ -197,26 +197,6 @@ section.reserved .energy .wh {
 section.reserved .check {
   margin: 2em 0;
 }
-section.reserved .check .lable {
-  padding: 6px 12px;
-  border-radius: 8px;
-  display: inline;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-section.reserved .check .lable.Good {
-  color: #3b5bdb;
-  background-color: #dbe4ff;
-}
-section.reserved .check .lable.Warning {
-  color: #f08c00;
-  background-color: #fff3bf;
-}
-section.reserved .check .lable.Danger {
-  color: #e03131;
-  background-color: #ffe3e3;
-}
 
 section.reserved .check .container {
   margin: 0.6em 0;
@@ -270,6 +250,17 @@ section.devices .container {
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(2, 1fr);
   gap: 1.4em 1em;
+}
+
+section.devices .header-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 2em;
+}
+section.devices .header-container .header {
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
 section.devices .card {
