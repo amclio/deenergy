@@ -10,6 +10,7 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import styles from '~/styles/processed/main.css'
 
 import { Card as CardContainer } from '~/components/main/card'
+import { StatusLabel } from '~/components/main/status'
 import {
   accumulatedSpendingState,
   devicesStateFamily,
@@ -150,12 +151,13 @@ export default function Index() {
     }))
   }, 1 * 1000)
 
-  const isGood = totalWh * (1 / 5) > entireUsage ? 'Good' : null
-  const isWarning =
+  const isGood: 'good' | null = totalWh * (1 / 5) > entireUsage ? 'good' : null
+  const isWarning: 'warning' | null =
     totalWh * (1 / 5) < entireUsage && totalWh * (4 / 5) > entireUsage
-      ? 'Warning'
+      ? 'warning'
       : null
-  const isDanger = totalWh * (4 / 5) < entireUsage ? 'Danger' : null
+  const isDanger: 'danger' | null =
+    totalWh * (4 / 5) < entireUsage ? 'danger' : null
 
   let currentState = isGood || isWarning || isDanger
 
@@ -179,9 +181,7 @@ export default function Index() {
             <span className="wh">{unit}</span>
           </div>
           <div className="check">
-            <div className={`lable ${currentState}`}>
-              에너지 절약 상태 — {currentState}
-            </div>
+            <StatusLabel state={currentState || 'good'} />
           </div>
         </section>
         <section className="graph">
