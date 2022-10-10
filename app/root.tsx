@@ -16,7 +16,7 @@ import {
 import { RecoilRoot } from 'recoil'
 
 import normalize from 'modern-normalize/modern-normalize.css'
-import { useEffect } from 'react'
+import { useLayoutEffect } from 'react'
 import { getCssText } from './libs/stitches'
 import { useSsrComplectedState } from './stores/prevent-ssr'
 
@@ -77,7 +77,7 @@ export const links: LinksFunction = () => {
 function PreventSsr() {
   // Ref: https://stackoverflow.com/questions/68110629/nextjs-react-recoil-persist-values-in-local-storage-initial-page-load-in-wrong/70459889#70459889
   const setSsrCompleted = useSsrComplectedState()
-  useEffect(setSsrCompleted, [setSsrCompleted])
+  useLayoutEffect(setSsrCompleted, [setSsrCompleted])
 
   return null
 }
