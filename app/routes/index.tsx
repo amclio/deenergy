@@ -1,18 +1,23 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import type { CardProps } from '~/components/main/card'
+import type { HueTokenResponse } from '~/interfaces/hue'
 
 import { useLoaderData } from '@remix-run/react'
 import Chart from 'chart.js/auto'
 import { useEffect, useRef, useState } from 'react'
 import { useInterval } from 'react-use'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
+import { client } from '~/libs/ky'
+import { styled } from '~/libs/stitches'
+
+import { userHueCode } from '~/cookies'
 
 import styles from '~/styles/processed/main.css'
 
 import { Button as ButtonContainer } from '~/components/common/button'
 import { Card as CardContainer } from '~/components/main/card'
 import { StatusLabel } from '~/components/main/status'
-import { styled } from '~/libs/stitches'
+import { useControllHue } from '~/hooks/hue'
 import {
   accumulatedSpendingState,
   devicesStateFamily,
@@ -20,12 +25,24 @@ import {
   recordingState,
   spendingTextsState,
 } from '~/stores/devices'
+import { useHueAccessTokenValue } from '~/stores/hue'
 
 interface Device {
   id: number
   name: string
   spending: number
   imageSrc: string
+  isHue?: boolean
+}
+
+interface LoaderData {
+  hueCode: string
+  hueAccessToken: string
+  hueRefreshToken: HueTokenResponse['refresh_token']
+  hueAccessTokenExpiresIn: HueTokenResponse['expires_in']
+  hueClientID: string
+
+  devices: Device[]
 }
 
 const Button = styled(ButtonContainer, {
@@ -36,6 +53,89 @@ const Button = styled(ButtonContainer, {
 
 export function links() {
   return [{ rel: 'stylesheet', href: styles }]
+}
+
+export const loader: LoaderFunction = async ({ request, context }) => {
+  const Devices: Device[] = [
+    {
+      id: 0,
+      name: '전구',
+      spending: 150,
+      imageSrc: './assets/images/lamp.png',
+      isHue: true,
+    },
+    {
+      id: 1,
+      name: 'TV',
+      spending: 300,
+      imageSrc: './assets/images/tv.png',
+    },
+    {
+      id: 2,
+      name: '에어컨',
+      spending: 1500,
+      imageSrc: './assets/images/air-conditioner.png',
+    },
+    {
+      id: 3,
+      name: '선풍기',
+      spending: 50,
+      imageSrc: './assets/images/fan.png',
+    },
+    {
+      id: 4,
+      name: '충전기',
+      spending: 15,
+      imageSrc: './assets/images/charger.png',
+    },
+  ]
+
+  const cookieHeader = request.headers.get('Cookie')
+  const cookie = (await userHueCode.parse(cookieHeader)) || {}
+
+  let { hueCode, hueRefreshToken } = cookie
+
+  let hueAccessToken = ''
+  let hueAccessTokenExpiresIn = 0
+
+  const isTokenInvalid = !cookie.hueRefreshToken
+
+  if (hueCode && isTokenInvalid) {
+    const auths = new URLSearchParams()
+
+    auths.set('grant_type', 'authorization_code')
+    auths.set('code', hueCode)
+    auths.set('client_id', (context.HUE_CLIENT_ID as string) || '')
+    auths.set('client_secret', (context.HUE_CLIENT_SECRET as string) || '')
+
+    const res = await client.post('https://api.meethue.com/v2/oauth2/token', {
+      body: auths,
+    })
+    const { refresh_token, access_token, expires_in } =
+      await res.json<HueTokenResponse>()
+
+    cookie.hueRefreshToken = refresh_token
+    hueAccessToken = access_token
+    hueRefreshToken = refresh_token
+    hueAccessTokenExpiresIn = expires_in
+  }
+
+  const bodyObject: LoaderData = {
+    hueCode,
+    hueAccessToken,
+    hueRefreshToken,
+    hueAccessTokenExpiresIn,
+    hueClientID: context.HUE_CLIENT_ID as string,
+    devices: Devices,
+  }
+  const body = JSON.stringify(bodyObject)
+
+  return new Response(body, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Set-Cookie': await userHueCode.serialize(cookie),
+    },
+  })
 }
 
 function Graph({ stat, unit }: { stat: number; unit: string }) {
@@ -101,7 +201,12 @@ function Graph({ stat, unit }: { stat: number; unit: string }) {
   return <canvas id="LineG" ref={ref} style={{ width: '100%' }}></canvas>
 }
 
-function Card({ cardId, ...props }: { cardId: number } & CardProps) {
+function Card({
+  cardId,
+  isHue,
+  handleHue,
+  ...props
+}: { cardId: number; isHue?: boolean; handleHue?: Function } & CardProps) {
   const [cardState, setCardState] = useRecoilState(devicesStateFamily(cardId))
 
   const setEntireUsage = useSetRecoilState(entireUsageState)
@@ -112,6 +217,10 @@ function Card({ cardId, ...props }: { cardId: number } & CardProps) {
       !cardState.status ? curr + props.spending : curr - props.spending
     )
     setCardState((state) => ({ ...state, status: !cardState.status }))
+
+    if (isHue && handleHue) {
+      handleHue(cardState.status ? 'off' : 'on')
+    }
   }
 
   useEffect(() => {
@@ -143,7 +252,11 @@ function Card({ cardId, ...props }: { cardId: number } & CardProps) {
 }
 
 export default function Index() {
-  const devices = useLoaderData<Device[]>()
+  const { devices, hueRefreshToken, hueAccessToken, hueClientID } =
+    useLoaderData<LoaderData>()
+  const HUE_CLIENT_ID =
+    typeof window !== 'undefined' ? window.ENV.HUE_CLIENT_ID : hueClientID
+
   const totalWh = devices.reduce((prev, curr) => prev + curr.spending, 0)
 
   const setSpending = useSetRecoilState(accumulatedSpendingState)
@@ -174,6 +287,40 @@ export default function Index() {
 
   let currentState = isGood || isWarning || isDanger
 
+  // Hue
+
+  const accessToken = useHueAccessTokenValue()
+  const [hueDevices, setHueDevices] = useState<any[]>()
+  const [hueCurrentDevice, setHueCurrentDevice] = useState<string>()
+  const {
+    getHueConfig,
+    getHueUsername,
+    getHueDevices,
+    controllLamp,
+    hueUsername,
+  } = useControllHue({
+    accessToken: hueAccessToken,
+    refreshToken: hueRefreshToken,
+  })
+
+  useEffect(() => {
+    const doLogin = async () => {
+      if (!hueUsername) {
+        await getHueConfig()
+        await getHueUsername()
+      }
+
+      if (hueUsername) {
+        setHueDevices(await getHueDevices())
+      }
+    }
+
+    if (accessToken) {
+      doLogin()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accessToken, hueUsername])
+
   return (
     <>
       <header>
@@ -181,6 +328,13 @@ export default function Index() {
           <div className="container">
             <div className="title">De에너지</div>
             <div className="sub">by CTQ from Seil</div>
+          </div>
+          <div className="container">
+            <a
+              href={`https://api.meethue.com/v2/oauth2/authorize?client_id=${HUE_CLIENT_ID}&response_type=code&state=1234`}
+            >
+              Hue 로그인
+            </a>
           </div>
         </div>
       </header>
@@ -251,11 +405,28 @@ export default function Index() {
           <div className="header-container">
             <div className="header">기기</div>
             <StatusLabel state={currentState || 'good'} />
+            <select onChange={(e) => setHueCurrentDevice(e.target.value)}>
+              {hueDevices?.map(
+                (device) =>
+                  device && (
+                    <option key={device.rid} value={device.rid}>
+                      {device.rid}
+                    </option>
+                  )
+              )}
+            </select>
           </div>
 
           <div className="container">
             {devices.map(({ id, ...metas }) => (
-              <Card key={id} cardId={id} {...metas} />
+              <Card
+                key={id}
+                cardId={id}
+                handleHue={(state: 'on' | 'off') =>
+                  controllLamp(hueCurrentDevice || '', state)
+                }
+                {...metas}
+              />
             ))}
           </div>
         </section>
@@ -283,41 +454,4 @@ export default function Index() {
       </footer>
     </>
   )
-}
-
-export const loader: LoaderFunction = () => {
-  const Devices: Device[] = [
-    {
-      id: 0,
-      name: '전구',
-      spending: 150,
-      imageSrc: './assets/images/lamp.png',
-    },
-    {
-      id: 1,
-      name: 'TV',
-      spending: 300,
-      imageSrc: './assets/images/tv.png',
-    },
-    {
-      id: 2,
-      name: '에어컨',
-      spending: 1500,
-      imageSrc: './assets/images/air-conditioner.png',
-    },
-    {
-      id: 3,
-      name: '선풍기',
-      spending: 50,
-      imageSrc: './assets/images/fan.png',
-    },
-    {
-      id: 4,
-      name: '충전기',
-      spending: 15,
-      imageSrc: './assets/images/charger.png',
-    },
-  ]
-
-  return Devices
 }
