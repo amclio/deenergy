@@ -1,34 +1,53 @@
+import type { LoaderFunction } from '@remix-run/cloudflare'
+import type { CardProps } from '~/components/main/card'
+
+import { useLoaderData } from '@remix-run/react'
 import Chart from 'chart.js/auto'
 import { useEffect, useRef, useState } from 'react'
+import { useInterval } from 'react-use'
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 
 import styles from '~/styles/processed/main.css'
 
-import type { CardProps } from '~/components/main/card'
 import { Card as CardContainer } from '~/components/main/card'
-import { devicesStateFamily, entireUsageState } from '~/stores/devices'
-import { useRecoilState } from 'recoil'
+import {
+  accumulatedSpendingState,
+  devicesStateFamily,
+  entireUsageState,
+  spendingTextsState,
+} from '~/stores/devices'
+
+interface Device {
+  id: number
+  name: string
+  spending: number
+  imageSrc: string
+}
 
 export function links() {
   return [{ rel: 'stylesheet', href: styles }]
 }
 
-function Graph() {
+function Graph({ stat }: { stat: number }) {
   const ref = useRef<HTMLCanvasElement>(null)
+  const [chart, setChart] = useState<Chart>()
 
   useEffect(() => {
     if (ref.current) {
-      var L1x = ['7월', '8월', '9월', '10월', '11월', '12월']
-      var L1y = [250, 280, 200, 180, 150, 300]
-      var L2y = [789, 987, 876, 765, 654, 543]
+      var L1x = ['5월', '6월', '7월', '8월', '9월', '10월']
+      var L1y = [150, 180, 250, 280, 220, 300]
+      // var L2y = [789, 987, 876, 765, 654, 543]
+      // var L1y = [0, 0, 0, 0, 0, 0]
+      var L2y = [0, 0, 0, 0, 0, 0]
 
-      new Chart(ref.current, {
+      const chart = new Chart(ref.current, {
         // type: 'line',
         type: 'bar',
         data: {
           labels: L1x, //x축
           datasets: [
             {
-              label: '2021년', //그래프 이름
+              label: '평균', //그래프 이름
               backgroundColor: '#ff6b6b', //그래프 배경색
               data: L1y, //y축
             },
@@ -55,51 +74,23 @@ function Graph() {
           },
         },
       })
+
+      setChart(chart)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    if (chart) {
+      chart.data.datasets[1].data[5] = stat
+    }
+    chart?.update()
+  }, [chart, stat])
 
   if (typeof window === 'undefined') return null
 
   return <canvas id="LineG" ref={ref} style={{ width: '100%' }}></canvas>
 }
-
-const Devices: {
-  id: number
-  name: string
-  spending: number
-  imageSrc: string
-}[] = [
-  {
-    id: 0,
-    name: '전구',
-    spending: 150,
-    imageSrc: './assets/images/lamp.png',
-  },
-  {
-    id: 1,
-    name: 'TV',
-    spending: 300,
-    imageSrc: './assets/images/tv.png',
-  },
-  {
-    id: 2,
-    name: '에어컨',
-    spending: 1500,
-    imageSrc: './assets/images/air-conditioner.png',
-  },
-  {
-    id: 3,
-    name: '선풍기',
-    spending: 50,
-    imageSrc: './assets/images/fan.png',
-  },
-  {
-    id: 4,
-    name: '충전기',
-    spending: 15,
-    imageSrc: './assets/images/charger.png',
-  },
-]
 
 function Card({ cardId, ...props }: { cardId: number } & CardProps) {
   const [cardState, setCardState] = useRecoilState(devicesStateFamily(cardId))
@@ -112,7 +103,7 @@ function Card({ cardId, ...props }: { cardId: number } & CardProps) {
     setEntireUsage((curr) =>
       !cardState.status ? curr + props.spending : curr - props.spending
     )
-    setCardState((state) => ({ ...state, status: !state.status }))
+    setCardState((state) => ({ ...state, status: !cardState.status }))
   }
 
   useEffect(() => {
@@ -120,13 +111,25 @@ function Card({ cardId, ...props }: { cardId: number } & CardProps) {
   }, [props.spending, setCardState])
 
   useEffect(() => {
-    if (props.spending && cardState.status !== null && !isLoaded) {
+    if (cardState.spending && cardState.status !== null && !isLoaded) {
       setEntireUsage((curr) =>
         cardState.status ? curr + props.spending : curr
       )
       setLoaded(true)
     }
-  }, [cardState.status, isLoaded, props.spending, setEntireUsage])
+    // if (props.spending && cardState.status !== null && !isLoaded) {
+    //   setEntireUsage((curr) =>
+    //     !cardState.status ? curr + props.spending : curr
+    //   )
+    //   setLoaded(false)
+    // }
+  }, [
+    cardState.spending,
+    cardState.status,
+    isLoaded,
+    props.spending,
+    setEntireUsage,
+  ])
 
   return (
     <CardContainer
@@ -138,6 +141,23 @@ function Card({ cardId, ...props }: { cardId: number } & CardProps) {
 }
 
 export default function Index() {
+  const devices = useLoaderData<Device[]>()
+  const totalWh = devices.reduce((prev, curr) => prev + curr.spending, 0)
+
+  const setSpending = useSetRecoilState(accumulatedSpendingState)
+
+  const entireUsage = useRecoilValue(entireUsageState)
+  const {
+    preserved: { text, unit, message },
+  } = useRecoilValue(spendingTextsState)
+
+  useInterval(() => {
+    setSpending(({ spending, preserved }) => ({
+      spending: spending + entireUsage,
+      preserved: preserved + (totalWh - entireUsage),
+    }))
+  }, 1 * 1000)
+
   return (
     <>
       <header>
@@ -154,8 +174,8 @@ export default function Index() {
             <div className="current">지금까지 절약한 에너지</div>
           </div>
           <div className="energy highlight">
-            <span className="number">8,883</span>
-            <span className="wh">kWh</span>
+            <span className="number">{message || text}</span>
+            <span className="wh">{unit}</span>
           </div>
           <div className="check">
             <div className="lable">에너지 절약 상태 — Good</div>
@@ -163,28 +183,27 @@ export default function Index() {
         </section>
         <section className="graph">
           <div className="header">에너지 절약량</div>
-          <Graph />
+          <Graph stat={text} />
         </section>
         <section className="compare">
           <div className="container">
             <div className="header">2021년 총 절약량</div>
             <div className="value">
-              <span className="number">10,100</span>
-              <span className="wh">kWh</span>
+              <span className="number">N/A</span>
             </div>
           </div>
           <div className="container">
             <div className="header">2022년 총 절약량</div>
             <div className="value highlight">
-              <span className="number">14,100</span>
-              <span className="wh">kWh</span>
+              <span className="number">{message || text}</span>
+              <span className="wh">{unit}</span>
             </div>
           </div>
         </section>
         <section className="devices">
           <div className="header">기기</div>
           <div className="container">
-            {Devices.map(({ id, ...metas }) => (
+            {devices.map(({ id, ...metas }) => (
               <Card key={id} cardId={id} {...metas} />
             ))}
           </div>
@@ -213,4 +232,41 @@ export default function Index() {
       </footer>
     </>
   )
+}
+
+export const loader: LoaderFunction = () => {
+  const Devices: Device[] = [
+    {
+      id: 0,
+      name: '전구',
+      spending: 150,
+      imageSrc: './assets/images/lamp.png',
+    },
+    {
+      id: 1,
+      name: 'TV',
+      spending: 300,
+      imageSrc: './assets/images/tv.png',
+    },
+    {
+      id: 2,
+      name: '에어컨',
+      spending: 1500,
+      imageSrc: './assets/images/air-conditioner.png',
+    },
+    {
+      id: 3,
+      name: '선풍기',
+      spending: 50,
+      imageSrc: './assets/images/fan.png',
+    },
+    {
+      id: 4,
+      name: '충전기',
+      spending: 15,
+      imageSrc: './assets/images/charger.png',
+    },
+  ]
+
+  return Devices
 }
