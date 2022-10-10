@@ -28,7 +28,7 @@ export function links() {
   return [{ rel: 'stylesheet', href: styles }]
 }
 
-function Graph({ stat }: { stat: number }) {
+function Graph({ stat, unit }: { stat: number; unit: string }) {
   const ref = useRef<HTMLCanvasElement>(null)
   const [chart, setChart] = useState<Chart>()
 
@@ -83,11 +83,10 @@ function Graph({ stat }: { stat: number }) {
   useEffect(() => {
     if (chart) {
       chart.data.datasets[1].data[5] = stat
+      chart.data.datasets[1].label = `2022년 (${unit})`
     }
     chart?.update()
-  }, [chart, stat])
-
-  if (typeof window === 'undefined') return null
+  }, [chart, stat, unit])
 
   return <canvas id="LineG" ref={ref} style={{ width: '100%' }}></canvas>
 }
@@ -95,9 +94,8 @@ function Graph({ stat }: { stat: number }) {
 function Card({ cardId, ...props }: { cardId: number } & CardProps) {
   const [cardState, setCardState] = useRecoilState(devicesStateFamily(cardId))
 
-  const [entireUsage, setEntireUsage] = useRecoilState(entireUsageState)
+  const setEntireUsage = useSetRecoilState(entireUsageState)
   const [isLoaded, setLoaded] = useState(false)
-  console.log('~ entireUsage', entireUsage)
 
   const handleClick = () => {
     setEntireUsage((curr) =>
@@ -117,12 +115,6 @@ function Card({ cardId, ...props }: { cardId: number } & CardProps) {
       )
       setLoaded(true)
     }
-    // if (props.spending && cardState.status !== null && !isLoaded) {
-    //   setEntireUsage((curr) =>
-    //     !cardState.status ? curr + props.spending : curr
-    //   )
-    //   setLoaded(false)
-    // }
   }, [
     cardState.spending,
     cardState.status,
@@ -158,6 +150,15 @@ export default function Index() {
     }))
   }, 1 * 1000)
 
+  const isGood = totalWh * (1 / 5) > entireUsage ? 'Good' : null
+  const isWarning =
+    totalWh * (1 / 5) < entireUsage && totalWh * (4 / 5) > entireUsage
+      ? 'Warning'
+      : null
+  const isDanger = totalWh * (4 / 5) < entireUsage ? 'Danger' : null
+
+  let currentState = isGood || isWarning || isDanger
+
   return (
     <>
       <header>
@@ -173,17 +174,19 @@ export default function Index() {
           <div className="section">
             <div className="current">지금까지 절약한 에너지</div>
           </div>
-          <div className="energy highlight">
+          <div className={`energy highlight ${currentState}`}>
             <span className="number">{message || text}</span>
             <span className="wh">{unit}</span>
           </div>
           <div className="check">
-            <div className="lable">에너지 절약 상태 — Good</div>
+            <div className={`lable ${currentState}`}>
+              에너지 절약 상태 — {currentState}
+            </div>
           </div>
         </section>
         <section className="graph">
           <div className="header">에너지 절약량</div>
-          <Graph stat={text} />
+          <Graph stat={text} unit={unit} />
         </section>
         <section className="compare">
           <div className="container">
@@ -194,7 +197,7 @@ export default function Index() {
           </div>
           <div className="container">
             <div className="header">2022년 총 절약량</div>
-            <div className="value highlight">
+            <div className={`value highlight ${currentState}`}>
               <span className="number">{message || text}</span>
               <span className="wh">{unit}</span>
             </div>

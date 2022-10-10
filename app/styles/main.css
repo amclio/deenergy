@@ -94,6 +94,13 @@
   transform: rotate(-1deg);
 }
 
+.highlight.Warning::before {
+  background-color: rgba(240, 140, 0, 0.4);
+}
+.highlight.Danger::before {
+  background-color: rgba(224, 49, 49, 0.4);
+}
+
 body {
   background-color: #fcfcfc;
 }
@@ -194,11 +201,23 @@ section.reserved .check .lable {
   padding: 6px 12px;
   border-radius: 8px;
   display: inline;
-  color: #3b5bdb;
   font-size: 0.8rem;
   font-weight: 600;
+}
+
+section.reserved .check .lable.Good {
+  color: #3b5bdb;
   background-color: #dbe4ff;
 }
+section.reserved .check .lable.Warning {
+  color: #f08c00;
+  background-color: #fff3bf;
+}
+section.reserved .check .lable.Danger {
+  color: #e03131;
+  background-color: #ffe3e3;
+}
+
 section.reserved .check .container {
   margin: 0.6em 0;
   display: flex;
