@@ -189,15 +189,9 @@ export default function Index() {
           <div className="section">
             <div className="current">지금까지 절약한 에너지</div>
           </div>
-          <div className={`energy highlight ${currentState}`}>
+          <div className={`energy highlight`}>
             <span className="number">{message || text}</span>
             <span className="wh">{unit}</span>
-          </div>
-          <div className="check">
-            <StatusLabel
-              style={{ height: '100%' }}
-              state={currentState || 'good'}
-            />
           </div>
           <div className="start-stop">
             <Button
@@ -247,7 +241,7 @@ export default function Index() {
           </div>
           <div className="container">
             <div className="header">2022년 총 절약량</div>
-            <div className={`value highlight ${currentState}`}>
+            <div className={`value highlight`}>
               <span className="number">{message || text}</span>
               <span className="wh">{unit}</span>
             </div>
