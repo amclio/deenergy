@@ -9,12 +9,15 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 
 import styles from '~/styles/processed/main.css'
 
+import { Button as ButtonContainer } from '~/components/common/button'
 import { Card as CardContainer } from '~/components/main/card'
 import { StatusLabel } from '~/components/main/status'
+import { styled } from '~/libs/stitches'
 import {
   accumulatedSpendingState,
   devicesStateFamily,
   entireUsageState,
+  recordingState,
   spendingTextsState,
 } from '~/stores/devices'
 
@@ -24,6 +27,12 @@ interface Device {
   spending: number
   imageSrc: string
 }
+
+const Button = styled(ButtonContainer, {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 4,
+})
 
 export function links() {
   return [{ rel: 'stylesheet', href: styles }]
@@ -144,11 +153,15 @@ export default function Index() {
     preserved: { text, unit, message },
   } = useRecoilValue(spendingTextsState)
 
+  const [isRecording, setIsRecording] = useRecoilState(recordingState)
+
   useInterval(() => {
-    setSpending(({ spending, preserved }) => ({
-      spending: spending + entireUsage,
-      preserved: preserved + (totalWh - entireUsage),
-    }))
+    if (isRecording) {
+      setSpending(({ spending, preserved }) => ({
+        spending: spending + entireUsage,
+        preserved: preserved + (totalWh - entireUsage),
+      }))
+    }
   }, 1 * 1000)
 
   const isGood: 'good' | null = totalWh * (1 / 5) > entireUsage ? 'good' : null
@@ -181,7 +194,44 @@ export default function Index() {
             <span className="wh">{unit}</span>
           </div>
           <div className="check">
-            <StatusLabel state={currentState || 'good'} />
+            <StatusLabel
+              style={{ height: '100%' }}
+              state={currentState || 'good'}
+            />
+          </div>
+          <div className="start-stop">
+            <Button
+              color={isRecording ? 'red' : 'green'}
+              onClick={() => setIsRecording((state) => !state)}
+            >
+              {isRecording ? (
+                <>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z" />
+                  </svg>
+                  측정 중지
+                </>
+              ) : (
+                <>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z" />
+                  </svg>
+                  측정 시작
+                </>
+              )}
+            </Button>
           </div>
         </section>
         <section className="graph">

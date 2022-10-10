@@ -219,6 +219,10 @@ section.reserved .check .container .circle svg {
   display: inline-block;
 }
 
+section.reserved .start-stop {
+  margin-top: 1em;
+}
+
 section.graph {
   margin-bottom: 0;
 }

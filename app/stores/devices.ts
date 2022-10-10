@@ -59,3 +59,8 @@ export const spendingTextsState = selector({
     }
   },
 })
+
+export const recordingState = atom<boolean>({
+  key: 'deviceRecordingState',
+  default: false,
+})
