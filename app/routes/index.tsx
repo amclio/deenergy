@@ -59,7 +59,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const Devices: Device[] = [
     {
       id: 0,
-      name: '전구',
+      name: '전등',
       spending: 150,
       imageSrc: './assets/images/lamp.png',
       isHue: true,
@@ -405,17 +405,17 @@ export default function Index() {
           <div className="header-container">
             <div className="header">기기</div>
             <StatusLabel state={currentState || 'good'} />
-            <select onChange={(e) => setHueCurrentDevice(e.target.value)}>
-              {hueDevices?.map(
-                (device) =>
-                  device && (
-                    <option key={device.rid} value={device.rid}>
-                      {device.rid}
-                    </option>
-                  )
-              )}
-            </select>
           </div>
+          <select onChange={(e) => setHueCurrentDevice(e.target.value)}>
+            {hueDevices?.map(
+              (device) =>
+                device && (
+                  <option key={device.rid} value={device.rid}>
+                    {device.rid.split('-')[0]}
+                  </option>
+                )
+            )}
+          </select>
 
           <div className="container">
             {devices.map(({ id, ...metas }) => (

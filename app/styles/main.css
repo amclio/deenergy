@@ -250,6 +250,10 @@ section.compare .container .value .wh {
   font-weight: 600;
 }
 
+section.devices select {
+  margin-bottom: 2em;
+}
+
 section.devices .container {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
