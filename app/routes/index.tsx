@@ -338,120 +338,122 @@ export default function Index() {
           </div>
         </div>
       </header>
-      <div className="content">
-        <section className="reserved">
-          <div className="section">
-            <div className="current">지금까지 절약한 에너지</div>
-          </div>
-          <div className={`energy highlight`}>
-            <span className="number">{message || text}</span>
-            <span className="wh">{unit}</span>
-          </div>
-          <div className="start-stop">
-            <Button
-              color={isRecording ? 'red' : 'green'}
-              onClick={() => setIsRecording((state) => !state)}
-            >
-              {isRecording ? (
-                <>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill="currentColor"
-                    viewBox="0 0 16 16"
-                  >
-                    <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z" />
-                  </svg>
-                  측정 중지
-                </>
-              ) : (
-                <>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill="currentColor"
-                    viewBox="0 0 16 16"
-                  >
-                    <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z" />
-                  </svg>
-                  측정 시작
-                </>
-              )}
-            </Button>
-          </div>
-        </section>
-        <section className="graph">
-          <div className="header">에너지 절약량</div>
-          <Graph stat={text} unit={unit} />
-        </section>
-        <section className="compare">
-          <div className="container">
-            <div className="header">2021년 총 절약량</div>
-            <div className="value">
-              <span className="number">N/A</span>
+      <div className="frame">
+        <div className="content">
+          <section className="reserved">
+            <div className="section">
+              <div className="current">지금까지 절약한 에너지</div>
             </div>
-          </div>
-          <div className="container">
-            <div className="header">2022년 총 절약량</div>
-            <div className={`value highlight`}>
+            <div className={`energy highlight`}>
               <span className="number">{message || text}</span>
               <span className="wh">{unit}</span>
             </div>
-          </div>
-        </section>
-        <section className="devices">
-          <div className="header-container">
-            <div className="header">기기</div>
-            <StatusLabel state={currentState || 'good'} />
-          </div>
-          <select onChange={(e) => setHueCurrentDevice(e.target.value)}>
-            {hueDevices?.map(
-              (device) =>
-                device && (
-                  <option key={device.rid} value={device.rid}>
-                    {device.rid.split('-')[0]}
-                  </option>
-                )
-            )}
-          </select>
-
-          <div className="container">
-            {devices.map(({ id, ...metas }) => (
-              <Card
-                key={id}
-                cardId={id}
-                handleHue={(state: 'on' | 'off') =>
-                  controllLamp(hueCurrentDevice || '', state)
-                }
-                {...metas}
-              />
-            ))}
-          </div>
-        </section>
-        <section className="more">
-          <div className="container">
-            <div className="box">
-              <div className="sub">더 알아보기</div>
-              <div className="title">이 앱의 스토리를 알고 싶으신가요?</div>
-              <div className="button-box">
-                <a href="/promotion" className="button">
-                  보러 가기
-                </a>
+            <div className="start-stop">
+              <Button
+                color={isRecording ? 'red' : 'green'}
+                onClick={() => setIsRecording((state) => !state)}
+              >
+                {isRecording ? (
+                  <>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      viewBox="0 0 16 16"
+                    >
+                      <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z" />
+                    </svg>
+                    측정 중지
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      viewBox="0 0 16 16"
+                    >
+                      <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z" />
+                    </svg>
+                    측정 시작
+                  </>
+                )}
+              </Button>
+            </div>
+          </section>
+          <section className="graph">
+            <div className="header">에너지 절약량</div>
+            <Graph stat={text} unit={unit} />
+          </section>
+          <section className="compare">
+            <div className="container">
+              <div className="header">2021년 총 절약량</div>
+              <div className="value">
+                <span className="number">N/A</span>
               </div>
             </div>
-          </div>
-        </section>
-      </div>
-      <footer>
-        <div className="container">
-          <div className="copyright">© CTQ from Seil.</div>
-          <div className="github">
-            <a href="https://github.com/amclio/energy-refactor">Sources</a>
-          </div>
+            <div className="container">
+              <div className="header">2022년 총 절약량</div>
+              <div className={`value highlight`}>
+                <span className="number">{message || text}</span>
+                <span className="wh">{unit}</span>
+              </div>
+            </div>
+          </section>
+          <section className="devices">
+            <div className="header-container">
+              <div className="header">기기</div>
+              <StatusLabel state={currentState || 'good'} />
+            </div>
+            <select onChange={(e) => setHueCurrentDevice(e.target.value)}>
+              {hueDevices?.map(
+                (device) =>
+                  device && (
+                    <option key={device.rid} value={device.rid}>
+                      {device.rid.split('-')[0]}
+                    </option>
+                  )
+              )}
+            </select>
+
+            <div className="container">
+              {devices.map(({ id, ...metas }) => (
+                <Card
+                  key={id}
+                  cardId={id}
+                  handleHue={(state: 'on' | 'off') =>
+                    controllLamp(hueCurrentDevice || '', state)
+                  }
+                  {...metas}
+                />
+              ))}
+            </div>
+          </section>
+          <section className="more">
+            <div className="container">
+              <div className="box">
+                <div className="sub">더 알아보기</div>
+                <div className="title">이 앱의 스토리를 알고 싶으신가요?</div>
+                <div className="button-box">
+                  <a href="/promotion" className="button">
+                    보러 가기
+                  </a>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
-      </footer>
+        <footer>
+          <div className="container">
+            <div className="copyright">© CTQ from Seil.</div>
+            <div className="github">
+              <a href="https://github.com/amclio/energy-refactor">Sources</a>
+            </div>
+          </div>
+        </footer>
+      </div>
     </>
   )
 }
