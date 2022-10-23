@@ -53,7 +53,6 @@ export function useControllHue({
 }: ControllHueProps) {
   const [refreshToken, setRefreshToken] = useHueRefreshToken()
   const [accessToken, setAccessToken] = useHueAccessToken()
-  console.log('~ accessToken', accessToken)
 
   useEffect(() => {
     setRefreshToken(hueRefreshToken)
@@ -86,7 +85,6 @@ export function useControllHue({
     const data = await client.post('/api/hue/username').json<any>()
 
     const username = data[0].success.username
-    console.log('~ username', username)
     setHueUsername(username)
 
     return hueUsername
@@ -95,8 +93,6 @@ export function useControllHue({
   // Retreiving devices
 
   const getHueDevices = async () => {
-    console.log('~ hueUsername', hueUsername)
-
     const res = await client.get('/api/hue/devices').json<any>()
     const devices = res.data.map((device: { services: any[] }) =>
       device.services.find((item: { rtype: string }) => item.rtype === 'light')

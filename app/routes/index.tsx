@@ -27,6 +27,17 @@ import {
 } from '~/stores/devices'
 import { useHueAccessTokenValue } from '~/stores/hue'
 
+interface WebAppInterface {
+  getReservedEnergy(
+    consumed_energy: number,
+    consumed_unit: string,
+    reserved_energy: number,
+    reserved_unit: string
+  ): void
+}
+
+declare var android: WebAppInterface
+
 interface Device {
   id: number
   name: string
@@ -264,6 +275,7 @@ export default function Index() {
   const entireUsage = useRecoilValue(entireUsageState)
   const {
     preserved: { text, unit, message },
+    spending,
   } = useRecoilValue(spendingTextsState)
 
   const [isRecording, setIsRecording] = useRecoilState(recordingState)
@@ -274,6 +286,10 @@ export default function Index() {
         spending: spending + entireUsage,
         preserved: preserved + (totalWh - entireUsage),
       }))
+
+      if (typeof android !== 'undefined') {
+        android.getReservedEnergy(spending.text, spending.unit, text, unit)
+      }
     }
   }, 1 * 1000)
 
