@@ -1,4 +1,6 @@
-# Welcome to Remix!
+# De에너지
+
+An application, made by CTQ from Seil, to save electricity.
 
 - [Remix Docs](https://remix.run/docs)
 
