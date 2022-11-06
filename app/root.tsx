@@ -36,7 +36,7 @@ export const loader: LoaderFunction = ({ context }) => {
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
-  title: 'New Remix App',
+  title: 'De에너지',
   viewport: 'width=device-width,initial-scale=1',
 })
 

@@ -419,7 +419,8 @@ footer .container {
   gap: 10px;
 }
 
-footer .container .github a {
+footer .container a {
+  display: block;
   color: #868e96;
   border-bottom: 1px dashed #000;
 }

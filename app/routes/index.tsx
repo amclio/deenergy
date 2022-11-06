@@ -346,10 +346,8 @@ export default function Index() {
             <div className="sub">by CTQ from Seil</div>
           </div>
           <div className="container">
-            <a
-              href={`https://api.meethue.com/v2/oauth2/authorize?client_id=${HUE_CLIENT_ID}&response_type=code&state=1234`}
-            >
-              Hue 로그인
+            <a href="https://github.com/rew1220/CTQ-DeEnergy/raw/main/CTQ_DeEnergy.apk">
+              앱 받기
             </a>
           </div>
         </div>
@@ -434,6 +432,13 @@ export default function Index() {
               )}
             </select>
 
+            <a
+              style={{ marginLeft: '0.5em' }}
+              href={`https://api.meethue.com/v2/oauth2/authorize?client_id=${HUE_CLIENT_ID}&response_type=code&state=1234`}
+            >
+              Hue 로그인
+            </a>
+
             <div className="container">
               {devices.map(({ id, ...metas }) => (
                 <Card
@@ -465,7 +470,7 @@ export default function Index() {
           <div className="container">
             <div className="copyright">© CTQ from Seil.</div>
             <div className="github">
-              <a href="https://github.com/amclio/energy-refactor">Sources</a>
+              <a href="https://github.com/amclio/deenergy">Sources</a>
             </div>
           </div>
         </footer>
