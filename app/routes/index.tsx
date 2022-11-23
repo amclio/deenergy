@@ -458,7 +458,7 @@ export default function Index() {
                 <div className="sub">더 알아보기</div>
                 <div className="title">이 앱의 스토리를 알고 싶으신가요?</div>
                 <div className="button-box">
-                  <a href="/promotion" className="button">
+                  <a href="https://promote.seil-ctq.com" className="button">
                     보러 가기
                   </a>
                 </div>
